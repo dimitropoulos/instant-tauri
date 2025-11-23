@@ -1,6 +1,6 @@
 {
   "name": "instant-tauri",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A quick demo Tauri app that shows your current directory and lets you pick files",
   "private": false,
   "type": "module",
