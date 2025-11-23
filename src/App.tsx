@@ -1,15 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
+import { open } from "@tauri-apps/plugin-dialog";
 import "./App.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [currentPath, setCurrentPath] = useState("");
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  useEffect(() => {
+    // Get the current directory on startup
+    invoke<string>("get_current_dir")
+      .then((path) => setCurrentPath(path))
+      .catch((error) => console.error("Failed to get current directory:", error));
+  }, []);
+
+  async function pickPackageJson() {
+    try {
+      const selected = await open({
+        multiple: false,
+        filters: [{
+          name: 'Package.json',
+          extensions: ['json']
+        }]
+      });
+      
+      if (selected && typeof selected === 'string') {
+        // Extract directory from the file path
+        const dirPath = selected.substring(0, selected.lastIndexOf('/'));
+        setCurrentPath(dirPath);
+      }
+    } catch (error) {
+      console.error("Failed to open file picker:", error);
+    }
   }
 
   return (
@@ -29,21 +51,15 @@ function App() {
       </div>
       <p>Click on the Tauri, Vite, and React logos to learn more.</p>
 
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
+      <div className="row" style={{ flexDirection: 'column', gap: '1rem', marginTop: '2rem' }}>
+        <div>
+          <strong>Current Directory:</strong>
+          <p style={{ wordBreak: 'break-all', margin: '0.5rem 0' }}>{currentPath || 'Loading...'}</p>
+        </div>
+        <button onClick={pickPackageJson}>
+          Pick package.json
+        </button>
+      </div>
     </main>
   );
 }
