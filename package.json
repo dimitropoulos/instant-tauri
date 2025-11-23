@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/dimitropoulos/instant-tauri#readme",
   "bin": {
-    "instant-tauri": "./bin/instant-tauri.js"
+    "instant-tauri": "bin/instant-tauri.js"
   },
   "files": [
     "bin",
