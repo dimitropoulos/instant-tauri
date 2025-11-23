@@ -1,8 +1,22 @@
 {
-  "name": "first-tauri",
-  "private": true,
+  "name": "instant-tauri",
+  "private": false,
   "version": "0.1.0",
   "type": "module",
+  "bin": {
+    "instant-tauri": "./bin/instant-tauri.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "src-tauri",
+    "src",
+    "public",
+    "index.html",
+    "vite.config.ts",
+    "tsconfig.json",
+    "tsconfig.node.json"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
