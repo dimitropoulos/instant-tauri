@@ -1,0 +1,144 @@
+name: Build Multi-Platform Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux-x64
+            target: x86_64-unknown-linux-gnu
+            binary: instant-tauri
+          - os: macos-13
+            platform: darwin-x64
+            target: x86_64-apple-darwin
+            binary: instant-tauri
+          - os: macos-latest
+            platform: darwin-arm64
+            target: aarch64-apple-darwin
+            binary: instant-tauri
+          - os: windows-latest
+            platform: win32-x64
+            target: x86_64-pc-windows-msvc
+            binary: instant-tauri.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Install frontend dependencies
+        run: pnpm install
+
+      - name: Build Tauri app
+        run: pnpm tauri build --target ${{ matrix.target }}
+
+      - name: Prepare binary
+        shell: bash
+        run: |
+          mkdir -p binaries/${{ matrix.platform }}
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            cp src-tauri/target/${{ matrix.target }}/release/${{ matrix.binary }} binaries/${{ matrix.platform }}/
+          else
+            cp src-tauri/target/${{ matrix.target }}/release/${{ matrix.binary }} binaries/${{ matrix.platform }}/
+            chmod +x binaries/${{ matrix.platform }}/${{ matrix.binary }}
+          fi
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-binary
+          path: binaries/${{ matrix.platform }}/${{ matrix.binary }}
+          retention-days: 7
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Organize binaries
+        run: |
+          mkdir -p binaries/linux-x64
+          mkdir -p binaries/darwin-x64
+          mkdir -p binaries/darwin-arm64
+          mkdir -p binaries/win32-x64
+          
+          cp artifacts/linux-x64-binary/instant-tauri binaries/linux-x64/
+          cp artifacts/darwin-x64-binary/instant-tauri binaries/darwin-x64/
+          cp artifacts/darwin-arm64-binary/instant-tauri binaries/darwin-arm64/
+          cp artifacts/win32-x64-binary/instant-tauri.exe binaries/win32-x64/
+          
+          chmod +x binaries/linux-x64/instant-tauri
+          chmod +x binaries/darwin-x64/instant-tauri
+          chmod +x binaries/darwin-arm64/instant-tauri
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Verify package contents
+        run: |
+          npm pack --dry-run
+          ls -la binaries/
+
+      - name: Publish to npm
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            binaries/linux-x64/instant-tauri
+            binaries/darwin-x64/instant-tauri
+            binaries/darwin-arm64/instant-tauri
+            binaries/win32-x64/instant-tauri.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

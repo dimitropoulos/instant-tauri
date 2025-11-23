@@ -1,21 +1,42 @@
 {
   "name": "instant-tauri",
-  "private": false,
   "version": "0.1.0",
+  "description": "A quick demo Tauri app that shows your current directory and lets you pick files",
+  "private": false,
   "type": "module",
+  "keywords": [
+    "tauri",
+    "desktop",
+    "app",
+    "file-picker",
+    "demo"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YOUR_USERNAME/instant-tauri.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/instant-tauri/issues"
+  },
+  "homepage": "https://github.com/YOUR_USERNAME/instant-tauri#readme",
   "bin": {
     "instant-tauri": "./bin/instant-tauri.js"
   },
   "files": [
     "bin",
-    "dist",
-    "src-tauri",
-    "src",
-    "public",
-    "index.html",
-    "vite.config.ts",
-    "tsconfig.json",
-    "tsconfig.node.json"
+    "binaries",
+    "BUILD.md"
+  ],
+  "os": [
+    "linux",
+    "darwin",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
   ],
   "scripts": {
     "dev": "vite",
