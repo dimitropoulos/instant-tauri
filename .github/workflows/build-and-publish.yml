@@ -6,6 +6,10 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
   build:
     strategy:
@@ -39,6 +43,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -128,8 +133,6 @@ jobs:
       - name: Publish to npm
         if: startsWith(github.ref, 'refs/tags/v')
         run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
