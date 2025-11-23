@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    first_tauri_lib::run()
+    instant_tauri_lib::run()
 }

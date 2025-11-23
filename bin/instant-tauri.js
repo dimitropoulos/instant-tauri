@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
-const { spawn } = require('child_process');
-const path = require('path');
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-// Run the Tauri app in production mode
-const tauriPath = path.join(__dirname, '..', 'node_modules', '.bin', 'tauri');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Run the Tauri app in dev mode
+const tauriPath = join(__dirname, '..', 'node_modules', '.bin', 'tauri');
 const proc = spawn(tauriPath, ['dev'], {
-  cwd: path.join(__dirname, '..'),
+  cwd: join(__dirname, '..'),
   stdio: 'inherit',
   shell: process.platform === 'win32'
 });
