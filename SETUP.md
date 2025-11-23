@@ -22,18 +22,9 @@ git commit -m "Initial commit"
 2. Create a new repository named `instant-tauri`
 3. Don't initialize with README (we already have files)
 
-### 3. Connect to GitHub
-
-```bash
-# Replace YOUR_USERNAME with your GitHub username
-git remote add origin https://github.com/YOUR_USERNAME/instant-tauri.git
-git branch -M main
-git push -u origin main
-```
-
 ### 4. Update package.json
 
-Edit `package.json` and replace `YOUR_USERNAME` with your actual GitHub username in:
+Edit `package.json` and replace `dimitropoulos` with your actual GitHub username in:
 - `repository.url`
 - `bugs.url`
 - `homepage`

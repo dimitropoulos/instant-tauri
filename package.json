@@ -15,12 +15,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YOUR_USERNAME/instant-tauri.git"
+    "url": "git+https://github.com/dimitropoulos/instant-tauri.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USERNAME/instant-tauri/issues"
+    "url": "https://github.com/dimitropoulos/instant-tauri/issues"
   },
-  "homepage": "https://github.com/YOUR_USERNAME/instant-tauri#readme",
+  "homepage": "https://github.com/dimitropoulos/instant-tauri#readme",
   "bin": {
     "instant-tauri": "./bin/instant-tauri.js"
   },
